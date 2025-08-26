@@ -7,6 +7,7 @@ import { useAppContext } from '@/context/appContext';
 import useLanguage from '@/locale/useLanguage';
 import logoIcon from '@/style/images/logo-icon.svg';
 import logoText from '@/style/images/logo-text.svg';
+import cproLogo from '@/style/images/cpro-logo.jpg';
 
 import useResponsive from '@/hooks/useResponsive';
 
@@ -151,7 +152,9 @@ function Sidebar({ collapsible, isMobile = false }) {
           cursor: 'pointer',
         }}
       >
-        <img src={logoIcon} alt="Logo" style={{ marginLeft: '-5px', height: '40px' }} />
+        <img src={cproLogo} alt="Logo" style={{ marginLeft: '-5px', height: '64px' }} />
+
+        {/* <img src={logoIcon} alt="Logo" style={{ marginLeft: '-5px', height: '40px' }} />
 
         {!showLogoApp && (
           <img
@@ -163,7 +166,7 @@ function Sidebar({ collapsible, isMobile = false }) {
               height: '38px',
             }}
           />
-        )}
+        )} */}
       </div>
       <Menu
         items={items}
