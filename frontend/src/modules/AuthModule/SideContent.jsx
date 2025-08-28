@@ -20,7 +20,7 @@ export default function SideContent() {
       className="sideContent"
     >
       <div style={{ width: '100%' }}>
-        <img
+        {/* <img
           src={logo}
           alt="IDURAR ERP CRM"
           style={{ margin: '0 0 40px', display: 'block' }}
@@ -33,7 +33,7 @@ export default function SideContent() {
         </Title>
         <Text>
           Accounting / Invoicing / Quote App <b /> based on Node.js React.js Ant Design
-        </Text>
+        </Text> */}
 
         <div className="space20"></div>
       </div>
