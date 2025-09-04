@@ -1,5 +1,6 @@
 import * as actionTypes from './types';
 import { request } from '@/request';
+import { appwriteRequest } from '@/request/appwriteRequest';
 
 export const crud = {
   resetState:
@@ -44,7 +45,9 @@ export const crud = {
         payload: null,
       });
 
-      let data = await request.list({ entity, options });
+      let data = entity === 'client' 
+        ? await appwriteRequest.list({ entity, options })
+        : await request.list({ entity, options });
 
       if (data.success === true) {
         const result = {
@@ -78,9 +81,13 @@ export const crud = {
       });
       let data = null;
       if (withUpload) {
-        data = await request.createAndUpload({ entity, jsonData });
+        data = entity === 'client'
+          ? await appwriteRequest.create({ entity, jsonData })
+          : await request.createAndUpload({ entity, jsonData });
       } else {
-        data = await request.create({ entity, jsonData });
+        data = entity === 'client'
+          ? await appwriteRequest.create({ entity, jsonData })
+          : await request.create({ entity, jsonData });
       }
 
       if (data.success === true) {
@@ -111,7 +118,9 @@ export const crud = {
         payload: null,
       });
 
-      let data = await request.read({ entity, id });
+      let data = entity === 'client'
+        ? await appwriteRequest.read({ entity, id })
+        : await request.read({ entity, id });
 
       if (data.success === true) {
         dispatch({
@@ -143,9 +152,13 @@ export const crud = {
       let data = null;
 
       if (withUpload) {
-        data = await request.updateAndUpload({ entity, id, jsonData });
+        data = entity === 'client'
+          ? await appwriteRequest.update({ entity, id, jsonData })
+          : await request.updateAndUpload({ entity, id, jsonData });
       } else {
-        data = await request.update({ entity, id, jsonData });
+        data = entity === 'client'
+          ? await appwriteRequest.update({ entity, id, jsonData })
+          : await request.update({ entity, id, jsonData });
       }
 
       if (data.success === true) {
@@ -180,7 +193,9 @@ export const crud = {
         payload: null,
       });
 
-      let data = await request.delete({ entity, id });
+      let data = entity === 'client'
+        ? await appwriteRequest.delete({ entity, id })
+        : await request.delete({ entity, id });
 
       if (data.success === true) {
         dispatch({
@@ -206,7 +221,13 @@ export const crud = {
         payload: null,
       });
 
-      let data = await request.search({ entity, options });
+      console.log('Redux search action - entity:', entity, 'options:', options);
+      
+      let data = entity === 'client'
+        ? await appwriteRequest.search({ entity, options })
+        : await request.search({ entity, options });
+        
+      console.log('Redux search result:', data);
 
       if (data.success === true) {
         dispatch({

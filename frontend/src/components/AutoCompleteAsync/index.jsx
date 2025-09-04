@@ -62,7 +62,11 @@ export default function AutoCompleteAsync({
   );
 
   const asyncSearch = async (options) => {
-    return await request.search({ entity, options });
+    console.log('AutoCompleteAsync asyncSearch called - entity:', entity, 'options:', options);
+    console.log('Using request.search (should go to Redux if entity=client)');
+    const result = await request.search({ entity, options });
+    console.log('AutoCompleteAsync search result:', result);
+    return result;
   };
 
   let { onFetch, result, isSuccess, isLoading } = useOnFetch();
@@ -92,6 +96,16 @@ export default function AutoCompleteAsync({
     setValToSearch(searchText);
   };
 
+  const onFocus = () => {
+    console.log('AutoCompleteAsync onFocus triggered, selectOptions.length:', selectOptions.length);
+    // Load initial data when dropdown is focused/opened
+    if (selectOptions.length === 0 && !isSearching.current) {
+      console.log('Triggering initial search with empty query');
+      setValToSearch(''); // This will trigger the search with empty query to load all items
+      setDebouncedValue(''); // Force immediate search
+    }
+  };
+
   useEffect(() => {
     if (isSuccess) {
       setOptions(result);
@@ -111,6 +125,16 @@ export default function AutoCompleteAsync({
     }
   }, [value]);
 
+  // Load initial data when component mounts
+  useEffect(() => {
+    console.log('AutoCompleteAsync mounted for entity:', entity);
+    if (entity === 'client') {
+      console.log('Loading initial client data...');
+      setValToSearch(''); // Trigger initial search for clients
+      setDebouncedValue('');
+    }
+  }, [entity]);
+
   return (
     <Select
       loading={isLoading}
@@ -122,6 +146,7 @@ export default function AutoCompleteAsync({
       notFoundContent={searching ? '... Searching' : <Empty />}
       value={currentValue}
       onSearch={onSearch}
+      onFocus={onFocus}
       onClear={() => {
         // setOptions([]);
         // setCurrentValue(undefined);

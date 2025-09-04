@@ -2,11 +2,10 @@ export const fields = {
   name: {
     type: 'string',
   },
-  country: {
-    type: 'country',
-    // color: 'red',
-  },
   address: {
+    type: 'string',
+  },
+  contact: {
     type: 'string',
   },
   phone: {
@@ -14,5 +13,12 @@ export const fields = {
   },
   email: {
     type: 'email',
+  },
+  abn: {
+    type: 'string',
+  },
+  modified: {
+    type: 'date',
+    disableForForm: true,
   },
 };
