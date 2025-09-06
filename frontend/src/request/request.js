@@ -4,6 +4,7 @@ import { API_BASE_URL } from '@/config/serverApiConfig';
 import errorHandler from './errorHandler';
 import successHandler from './successHandler';
 import storePersist from '@/redux/storePersist';
+import { appwriteRequest } from './appwriteRequest';
 
 function findKeyByPrefix(object, prefix) {
   for (var property in object) {
@@ -132,6 +133,14 @@ const request = {
   },
 
   search: async ({ entity, options = {} }) => {
+    console.log('request.search called - entity:', entity, 'options:', options);
+    
+    // Route client searches to Appwrite
+    if (entity === 'client') {
+      console.log('Routing client search to Appwrite');
+      return await appwriteRequest.search({ entity, options });
+    }
+    
     try {
       includeToken();
       let query = '?';
