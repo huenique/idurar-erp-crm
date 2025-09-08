@@ -8,7 +8,7 @@ export const BASE_URL =
     : 'http://localhost:8888/';
 
 export const WEBSITE_URL = import.meta.env.PROD
-  ? 'http://cloud.idurarapp.com/'
+  ? 'http://165.22.253.173:3000/'
   : 'http://localhost:3000/';
 export const DOWNLOAD_BASE_URL =
   import.meta.env.PROD || import.meta.env.VITE_DEV_REMOTE
