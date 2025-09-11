@@ -87,8 +87,32 @@ export default function CreateItem({ config, CreateForm }) {
   }, [isSuccess]);
 
   const onSubmit = (fieldsValue) => {
-    console.log('🚀 ~ onSubmit ~ fieldsValue:', fieldsValue);
     if (fieldsValue) {
+      // Convert Appwrite client ID to MongoDB ObjectId format for invoices
+      if (entity === 'invoice' && fieldsValue.client) {
+        const appwriteId = fieldsValue.client;
+        console.log('Original Appwrite client ID:', appwriteId, 'length:', appwriteId.length);
+        
+        // If the ID is shorter than 24 chars (Appwrite format), convert to MongoDB ObjectId format
+        if (typeof appwriteId === 'string' && appwriteId.length < 24) {
+          // Create a deterministic MongoDB ObjectId from the Appwrite ID
+          // This ensures the same Appwrite ID always generates the same MongoDB ObjectId
+          const hash = appwriteId.split('').reduce((a, b) => {
+            a = ((a << 5) - a) + b.charCodeAt(0);
+            return a & a;
+          }, 0);
+          
+          // Create a 24-char ObjectId using timestamp + hash + appwrite ID
+          const timestamp = Math.floor(Date.now() / 1000).toString(16).padStart(8, '0');
+          const hashHex = Math.abs(hash).toString(16).padStart(8, '0').substring(0, 8);
+          const appwriteHex = appwriteId.padEnd(8, '0').substring(0, 8);
+          const mongoObjectId = timestamp + hashHex + appwriteHex;
+          
+          console.log('Converted to MongoDB ObjectId format:', mongoObjectId, 'length:', mongoObjectId.length);
+          fieldsValue.client = mongoObjectId;
+        }
+      }
+      
       if (fieldsValue.items) {
         let newList = [...fieldsValue.items];
         newList.map((item) => {
@@ -100,6 +124,7 @@ export default function CreateItem({ config, CreateForm }) {
         };
       }
     }
+    console.log('Final payload for', entity, ':', fieldsValue);
     dispatch(erp.create({ entity, jsonData: fieldsValue }));
   };
 

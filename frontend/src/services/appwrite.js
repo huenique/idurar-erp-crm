@@ -43,7 +43,8 @@ export const appwriteConfig = {
   bucketsId: import.meta.env.VITE_APPWRITE_BUCKET_ID,
   functionId: import.meta.env.VITE_APPWRITE_FUNCTION_ID,
   collections: {
-    customers: 'customers' // Will be dynamically determined
+    customers: 'customers', // Will be dynamically determined
+    tickets: 'tickets' // Tickets collection name
   }
 };
 
@@ -76,6 +77,21 @@ export const findCustomerCollection = async () => {
   } catch (error) {
     console.error('Failed to find customer collection:', error);
     return 'customers'; // fallback
+  }
+};
+
+// Function to find the tickets collection - simplified to avoid listCollections issues
+export const findTicketsCollection = async () => {
+  try {
+    // Since we know the collection name is 'tickets', let's use it directly
+    // This avoids the listCollections call which seems to be causing issues
+    const ticketsCollectionId = 'tickets';
+    appwriteConfig.collections.tickets = ticketsCollectionId;
+    console.log('Using tickets collection:', ticketsCollectionId);
+    return ticketsCollectionId;
+  } catch (error) {
+    console.error('Failed to find tickets collection:', error);
+    return 'tickets'; // fallback to the provided name
   }
 };
 

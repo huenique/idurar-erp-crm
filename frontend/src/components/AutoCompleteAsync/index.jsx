@@ -38,10 +38,18 @@ export default function AutoCompleteAsync({
 
   const handleSelectChange = (newValue) => {
     isUpdating.current = false;
-    // setCurrentValue(value[outputValue] || value); // set nested value or value
-    // onChange(newValue[outputValue] || newValue);
     if (onChange) {
-      if (newValue) onChange(newValue[outputValue] || newValue);
+      if (newValue && newValue !== 'redirectURL') {
+        // Find the full object from selectOptions to ensure we have the complete ObjectId
+        const selectedOption = selectOptions.find(option => 
+          (option[outputValue] || option) === newValue
+        );
+        if (selectedOption && outputValue === '_id') {
+          onChange(selectedOption._id);
+        } else {
+          onChange(newValue);
+        }
+      }
     }
     if (newValue === 'redirectURL' && withRedirect) {
       navigate(urlToRedirect);
@@ -62,10 +70,7 @@ export default function AutoCompleteAsync({
   );
 
   const asyncSearch = async (options) => {
-    console.log('AutoCompleteAsync asyncSearch called - entity:', entity, 'options:', options);
-    console.log('Using request.search (should go to Redux if entity=client)');
     const result = await request.search({ entity, options });
-    console.log('AutoCompleteAsync search result:', result);
     return result;
   };
 
@@ -97,10 +102,8 @@ export default function AutoCompleteAsync({
   };
 
   const onFocus = () => {
-    console.log('AutoCompleteAsync onFocus triggered, selectOptions.length:', selectOptions.length);
     // Load initial data when dropdown is focused/opened
     if (selectOptions.length === 0 && !isSearching.current) {
-      console.log('Triggering initial search with empty query');
       setValToSearch(''); // This will trigger the search with empty query to load all items
       setDebouncedValue(''); // Force immediate search
     }
@@ -127,9 +130,7 @@ export default function AutoCompleteAsync({
 
   // Load initial data when component mounts
   useEffect(() => {
-    console.log('AutoCompleteAsync mounted for entity:', entity);
     if (entity === 'client') {
-      console.log('Loading initial client data...');
       setValToSearch(''); // Trigger initial search for clients
       setDebouncedValue('');
     }

@@ -60,7 +60,7 @@ export default function SidePanel({ config, topContent, bottomContent, fixHeader
       placement="right"
       onClose={collapsePanel}
       open={!isPanelClose}
-      width={450}
+      width={800}
     >
       <div
         className="sidePanelContent"

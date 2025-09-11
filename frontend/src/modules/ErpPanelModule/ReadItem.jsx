@@ -120,6 +120,14 @@ export default function ReadItem({ config, selectedItem }) {
   useEffect(() => {
     if (currentErp?.client) {
       setClient(currentErp.client);
+    } else {
+      // Set empty client object if client is null to prevent errors
+      setClient({
+        name: 'Unknown Client',
+        address: '',
+        email: '',
+        phone: ''
+      });
     }
   }, [currentErp]);
 
@@ -235,10 +243,10 @@ export default function ReadItem({ config, selectedItem }) {
         </Row>
       </PageHeader>
       <Divider dashed />
-      <Descriptions title={`Client : ${currentErp.client.name}`}>
-        <Descriptions.Item label={translate('Address')}>{client.address}</Descriptions.Item>
-        <Descriptions.Item label={translate('email')}>{client.email}</Descriptions.Item>
-        <Descriptions.Item label={translate('Phone')}>{client.phone}</Descriptions.Item>
+      <Descriptions title={`Client : ${currentErp.client?.name || 'Unknown Client'}`}>
+        <Descriptions.Item label={translate('Address')}>{client?.address || 'N/A'}</Descriptions.Item>
+        <Descriptions.Item label={translate('email')}>{client?.email || 'N/A'}</Descriptions.Item>
+        <Descriptions.Item label={translate('Phone')}>{client?.phone || 'N/A'}</Descriptions.Item>
       </Descriptions>
       <Divider />
       <Row gutter={[12, 0]}>
