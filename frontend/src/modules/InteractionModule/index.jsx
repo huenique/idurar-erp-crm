@@ -69,7 +69,7 @@ function InteractionCreateForm({ config, formElements }) {
   }, [isSuccess]);
 
   return (
-    <Row gutter={16} style={{ height: '70vh' }}>
+    <Row gutter={16} style={{ minHeight: '400px', paddingBottom: '60px' }}>
       <Col span={12}>
         <Loading isLoading={isLoading}>
           <Form 
@@ -163,7 +163,7 @@ function InteractionUpdateForm({ config, formElements }) {
   
   return (
     <div style={show}>
-      <Row gutter={16} style={{ height: '70vh' }}>
+      <Row gutter={16} style={{ minHeight: '400px', paddingBottom: '60px' }}>
         <Col span={12}>
           <Loading isLoading={isLoading}>
             <Form 

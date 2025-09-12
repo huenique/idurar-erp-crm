@@ -34,7 +34,7 @@ export default function InteractionDataTable({ config }) {
   const translate = useLanguage();
   const dispatch = useDispatch();
   const { crudContextAction } = useCrudContext();
-  const { panel, editBox, readBox, collapsedBox } = crudContextAction;
+  const { panel, editBox, readBox, collapsedBox, modal } = crudContextAction;
   
   const { result: listResult, isLoading } = useSelector(selectListItems);
   const [interactions, setInteractions] = useState([]);
@@ -79,6 +79,7 @@ export default function InteractionDataTable({ config }) {
 
   const handleDelete = (record) => {
     dispatch(crud.currentAction({ actionType: 'delete', data: record }));
+    modal.open();
   };
 
   const columns = [
