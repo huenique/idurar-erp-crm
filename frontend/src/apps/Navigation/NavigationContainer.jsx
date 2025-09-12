@@ -60,6 +60,11 @@ function Sidebar({ collapsible, isMobile = false }) {
       icon: <CustomerServiceOutlined />,
       label: <Link to={'/customer'}>{translate('customers')}</Link>,
     },
+    {
+      key: 'interaction',
+      icon: <ReconciliationOutlined />,
+      label: <Link to={'/interaction'}>{translate('interactions')}</Link>,
+    },
 
     {
       key: 'invoice',
@@ -95,7 +100,7 @@ function Sidebar({ collapsible, isMobile = false }) {
     {
       key: 'about',
       label: <Link to={'/about'}>{translate('about')}</Link>,
-      icon: <ReconciliationOutlined />,
+      icon: <FileOutlined />,
     },
   ];
 

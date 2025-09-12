@@ -161,6 +161,30 @@ const request = {
     }
   },
 
+  searchBackend: async ({ entity, options = {} }) => {
+    console.log('request.searchBackend called - entity:', entity, 'options:', options);
+    console.log('Forcing backend search, bypassing Appwrite routing');
+    
+    try {
+      includeToken();
+      let query = '?';
+      for (var key in options) {
+        query += key + '=' + options[key] + '&';
+      }
+      query = query.slice(0, -1);
+      
+      const response = await axios.get(entity + '/search' + query);
+
+      successHandler(response, {
+        notifyOnSuccess: false,
+        notifyOnFailed: false,
+      });
+      return response.data;
+    } catch (error) {
+      return errorHandler(error);
+    }
+  },
+
   list: async ({ entity, options = {} }) => {
     try {
       includeToken();

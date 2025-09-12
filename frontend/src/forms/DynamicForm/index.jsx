@@ -13,6 +13,7 @@ import { countryList } from '@/utils/countryList';
 export default function DynamicForm({ fields, isUpdateForm = false }) {
   const [feedback, setFeedback] = useState();
 
+
   return (
     <div>
       {Object.keys(fields).map((key) => {
@@ -40,6 +41,7 @@ function FormElement({ field, feedback, setFeedback }) {
   const translate = useLanguage();
   const money = useMoney();
   const { dateFormat } = useDate();
+
 
   const { TextArea } = Input;
 
@@ -315,6 +317,8 @@ function FormElement({ field, feedback, setFeedback }) {
         placeholder={translate('select_date')}
         style={{ width: '100%' }}
         format={dateFormat}
+        showTime={false}
+        allowClear={true}
       />
     ),
     async: (
