@@ -7,11 +7,12 @@
   },
   "scripts": {
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js --ignore public/",
-    "production": "NODE_ENV=production",
+    "dev": "nodemon src/server.js --ignore public/ --ignore uploads/",
     "setup": "node src/setup/setup.js",
+    "reset": "node src/setup/reset.js",
     "upgrade": "node src/setup/upgrade.js",
-    "reset": "node src/setup/reset.js"
+    "prod": "NODE_ENV=production node src/server.js",
+    "test:env": "node -e \"require('dotenv').config(); console.log('Environment loaded successfully'); console.log('DATABASE:', process.env.DATABASE ? '✅ Set' : '❌ Missing'); console.log('JWT_SECRET:', process.env.JWT_SECRET ? '✅ Set' : '❌ Missing');\""
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.509.0",

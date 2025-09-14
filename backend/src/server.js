@@ -6,24 +6,51 @@ const path = require('path');
 // Make sure we are running node 7.6+
 const [major, minor] = process.versions.node.split('.').map(parseFloat);
 if (major < 20) {
-  console.log('Please upgrade your node.js version at least 20 or greater. 👌\n ');
-  process.exit();
+  console.log('🚫 Please upgrade your node.js version to at least 20 or greater. 👌\n ');
+  process.exit(1);
 }
 
-// import environmental variables from our variables.env file
+// Import environmental variables from our variables.env file
 require('dotenv').config({ path: '.env' });
 require('dotenv').config({ path: '.env.local' });
 
+// Environment validation
+function validateEnvironment() {
+  const requiredEnvVars = ['DATABASE', 'JWT_SECRET'];
+  const missing = requiredEnvVars.filter((envVar) => !process.env[envVar]);
+
+  if (missing.length > 0) {
+    console.error('🚫 Missing required environment variables:');
+    missing.forEach((envVar) => console.error(`   - ${envVar}`));
+    console.error('\n💡 Please check your .env file and ensure all required variables are set.');
+    console.error('📝 See .env.example for reference.\n');
+    process.exit(1);
+  }
+}
+
+// Validate environment before proceeding
+validateEnvironment();
+
+console.log(`🚀 Starting IDURAR ERP CRM Backend...`);
+console.log(`📦 Environment: ${process.env.NODE_ENV || 'development'}`);
+console.log(`🔌 Port: ${process.env.PORT || 8888}`);
+
 mongoose.connect(process.env.DATABASE);
 
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-
 mongoose.connection.on('error', (error) => {
-  console.log(
-    `1. 🔥 Common Error caused issue → : check your .env file first and add your mongodb url`
-  );
-  console.error(`2. 🚫 Error → : ${error.message}`);
+  console.error('🚫 MongoDB Connection Error:');
+  console.error(`   ${error.message}`);
+  console.error('\n� Common solutions:');
+  console.error('   - Check if MongoDB is running');
+  console.error('   - Verify DATABASE URL in .env file');
+  console.error('   - Ensure database credentials are correct\n');
 });
+
+mongoose.connection.on('connected', () => {
+  console.log('✅ MongoDB connected successfully');
+});
+
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 const modelsFiles = globSync('./src/models/**/*.js');
 
@@ -35,5 +62,17 @@ for (const filePath of modelsFiles) {
 const app = require('./app');
 app.set('port', process.env.PORT || 8888);
 const server = app.listen(app.get('port'), () => {
-  console.log(`Express running → On PORT : ${server.address().port}`);
+  console.log(`🚀 IDURAR ERP CRM Backend is running!`);
+  console.log(`📡 Server URL: http://localhost:${server.address().port}`);
+  console.log(`🔗 API Base: http://localhost:${server.address().port}/api`);
+  console.log(
+    `📁 File Server: ${
+      process.env.PUBLIC_SERVER_FILE || `http://localhost:${server.address().port}/`
+    }`
+  );
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`\n🛠️  Development mode active`);
+    console.log(`💡 API Documentation available at: http://localhost:${server.address().port}/api`);
+  }
+  console.log(`\n✅ Ready to accept requests!\n`);
 });
