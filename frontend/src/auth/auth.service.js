@@ -1,4 +1,12 @@
 import { API_BASE_URL } from '@/config/serverApiConfig';
+import { 
+  isTokenAuth,
+  isEmailAuth,
+  getTokenFromUrl,
+  getTenantIdFromUrl,
+  getUserEmailFromUrl,
+  getStoredUserEmail 
+} from '@/config/tokenConfig';
 
 import axios from 'axios';
 import errorHandler from '@/request/errorHandler';
@@ -15,13 +23,55 @@ export const login = async ({ loginData }) => {
     const { status, data } = response;
 
     if (data.success) {
-      const appwriteResult = await appwriteAuth.login(
-        import.meta.env.VITE_USERNAME,
-        import.meta.env.VITE_PASSWORD
-      );
-      
-      if (!appwriteResult.success) {
-        console.warn('Appwrite authentication failed:', appwriteResult.error);
+      // Check authentication method
+      if (isTokenAuth()) {
+        // Token-based authentication from ticketing system
+        const token = getTokenFromUrl();
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('userId') || urlParams.get('uid');
+        const tenantId = getTenantIdFromUrl();
+        
+        console.log('User from ticketing system (token-based)');
+        console.log('Token authentication with tenant:', tenantId);
+        
+        if (token && userId) {
+          const appwriteResult = await appwriteAuth.loginWithToken(userId, token);
+          
+          if (!appwriteResult.success) {
+            console.warn('Token-based Appwrite authentication failed:', appwriteResult.error);
+          } else {
+            console.log('Successfully authenticated with Appwrite using token');
+            console.log('Tenant context:', tenantId);
+          }
+        } else {
+          console.warn('Token or userId missing, cannot authenticate with Appwrite');
+        }
+      } else if (isEmailAuth()) {
+        // Email-based authentication (fallback)
+        const userEmail = getUserEmailFromUrl() || getStoredUserEmail();
+        const tenantId = getTenantIdFromUrl();
+        
+        console.log('User from ticketing system (email-based fallback)');
+        console.log('Email context:', userEmail, 'Tenant:', tenantId);
+        
+        const appwriteResult = await appwriteAuth.loginWithTicketingSystemContext();
+        
+        if (!appwriteResult.success) {
+          console.warn('Email-based Appwrite authentication failed:', appwriteResult.error);
+        } else {
+          console.log('Successfully authenticated with Appwrite using email method');
+          console.log('Tenant context:', appwriteResult.tenantId);
+        }
+      } else {
+        // Standard CRM login
+        const appwriteResult = await appwriteAuth.login(
+          import.meta.env.VITE_USERNAME,
+          import.meta.env.VITE_PASSWORD
+        );
+
+        if (!appwriteResult.success) {
+          console.warn('Default Appwrite authentication failed:', appwriteResult.error);
+        }
       }
     }
 
@@ -94,14 +144,13 @@ export const resetPassword = async ({ resetPasswordData }) => {
     return errorHandler(error);
   }
 };
+
 export const logout = async () => {
   axios.defaults.withCredentials = true;
   try {
-    // window.localStorage.clear();
     const response = await axios.post(API_BASE_URL + `logout?timestamp=${new Date().getTime()}`);
     const { status, data } = response;
 
-    // Logout from Appwrite as well
     console.log('Attempting Appwrite logout...');
     const appwriteResult = await appwriteAuth.logout();
     console.log('Appwrite logout result:', appwriteResult);
@@ -123,7 +172,3 @@ export const logout = async () => {
     return errorHandler(error);
   }
 };
-
-//  console.log(
-//    '🚀 Welcome to IDURAR ERP CRM! Did you know that we also offer commercial customization services? Contact us at hello@idurarapp.com for more information.'
-//  );
