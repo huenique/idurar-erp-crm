@@ -27,6 +27,18 @@ export default ({ mode }) => {
         },
       },
     },
+    preview: {
+      port: 3000,
+      host: true,
+      allowedHosts: ['monitor.cpro.net.au', 'localhost', '192.168.20.111'],
+      proxy: {
+        '/api': {
+          target: proxyTarget,
+          changeOrigin: true,
+          secure: false,
+        },
+      },
+    },
   };
   return defineConfig(config);
 };

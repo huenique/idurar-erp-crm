@@ -5,7 +5,15 @@ const fs = require('fs');
 const { generate: uniqueId } = require('shortid');
 
 const mongoose = require('mongoose');
-mongoose.connect(process.env.DATABASE);
+
+// MongoDB connection options for stability
+const mongooseOptions = {
+  serverSelectionTimeoutMS: 5000,
+  socketTimeoutMS: 45000,
+  family: 4,
+};
+
+mongoose.connect(process.env.DATABASE, mongooseOptions);
 
 async function setupApp() {
   try {

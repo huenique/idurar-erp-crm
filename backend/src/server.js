@@ -35,12 +35,22 @@ console.log(`🚀 Starting IDURAR ERP CRM Backend...`);
 console.log(`📦 Environment: ${process.env.NODE_ENV || 'development'}`);
 console.log(`🔌 Port: ${process.env.PORT || 8888}`);
 
-mongoose.connect(process.env.DATABASE);
+// MongoDB connection options for production stability
+const mongooseOptions = {
+  serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
+  socketTimeoutMS: 45000, // Close sockets after 45s of inactivity
+  family: 4, // Use IPv4, skip trying IPv6
+  maxPoolSize: 10, // Maintain up to 10 socket connections
+  minPoolSize: 2, // Maintain at least 2 socket connections
+  maxIdleTimeMS: 10000, // Close idle connections after 10s
+};
+
+mongoose.connect(process.env.DATABASE, mongooseOptions);
 
 mongoose.connection.on('error', (error) => {
   console.error('🚫 MongoDB Connection Error:');
   console.error(`   ${error.message}`);
-  console.error('\n� Common solutions:');
+  console.error('\n💡 Common solutions:');
   console.error('   - Check if MongoDB is running');
   console.error('   - Verify DATABASE URL in .env file');
   console.error('   - Ensure database credentials are correct\n');
@@ -48,6 +58,15 @@ mongoose.connection.on('error', (error) => {
 
 mongoose.connection.on('connected', () => {
   console.log('✅ MongoDB connected successfully');
+  console.log(`🔗 Database: ${process.env.DATABASE.split('@')[1] || process.env.DATABASE}`);
+});
+
+mongoose.connection.on('disconnected', () => {
+  console.warn('⚠️  MongoDB disconnected. Attempting to reconnect...');
+});
+
+mongoose.connection.on('reconnected', () => {
+  console.log('✅ MongoDB reconnected successfully');
 });
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
