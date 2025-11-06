@@ -58,6 +58,11 @@ const request = {
   },
   read: async ({ entity, id }) => {
     try {
+      // Route client entity to Appwrite
+      if (entity === 'client') {
+        return await appwriteRequest.read({ entity, id });
+      }
+
       includeToken();
       const response = await axios.get(entity + '/read/' + id);
       successHandler(response, {
