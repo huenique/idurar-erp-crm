@@ -67,7 +67,9 @@ const transformAppwriteDocument = (doc) => {
     phone: phone,
     email: email,
     abn: data.abn || '',
-    modified: $updatedAt
+    modified: $updatedAt,
+    // Add items array for compatibility with ReadItem component
+    items: []
   };
 };
 

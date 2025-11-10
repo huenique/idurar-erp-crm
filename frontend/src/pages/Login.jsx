@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 import useLanguage from '@/locale/useLanguage';
 
@@ -24,15 +24,36 @@ const LoginPage = () => {
   const translate = useLanguage();
   const { isLoading, isSuccess } = useSelector(selectAuth);
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
   const [autoLoginAttempted, setAutoLoginAttempted] = useState(false);
   const [authMethod, setAuthMethod] = useState('manual');
+  const [intendedDestination, setIntendedDestination] = useState(null);
 
   useEffect(() => {
     // Check if user came from ticketing system
     const token = getTokenFromUrl();
     const email = getUserEmailFromUrl();
     const tenantId = getTenantIdFromUrl();
+
+    // Store intended destination if user navigated to a specific page
+    // Preserve the full path including parameters
+    const currentPath = window.location.pathname;
+    const currentSearch = window.location.search;
+    const fullPath = currentPath + currentSearch;
+
+    // Only store if it's not the login page and not root
+    if (currentPath !== '/login' && currentPath !== '/') {
+      // Store the path without auth parameters for cleaner redirect
+      const url = new URL(window.location.href);
+      url.searchParams.delete('token');
+      url.searchParams.delete('tenant');
+      url.searchParams.delete('db');
+      url.searchParams.delete('email');
+      const cleanPath = url.pathname + url.search;
+      setIntendedDestination(cleanPath);
+      console.log('Stored intended destination:', cleanPath);
+    }
 
     if ((token || email) && !isSuccess && !isLoading && !autoLoginAttempted) {
       if (token) {
@@ -58,8 +79,13 @@ const LoginPage = () => {
   }, [dispatch, isSuccess, isLoading, autoLoginAttempted]);
 
   useEffect(() => {
-    if (isSuccess) navigate('/');
-  }, [isSuccess, navigate]);
+    if (isSuccess) {
+      // Navigate to intended destination or default to home
+      const destination = intendedDestination || '/';
+      console.log('Authentication successful, navigating to:', destination);
+      navigate(destination);
+    }
+  }, [isSuccess, navigate, intendedDestination]);
 
   const FormContainer = () => {
     const token = getTokenFromUrl();

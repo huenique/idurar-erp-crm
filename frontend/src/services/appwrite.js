@@ -129,29 +129,17 @@ export const appwriteConfig = {
 
 export const findCustomerCollection = async () => {
   try {
-    const collections = await databases.listCollections(appwriteConfig.databaseId);
-    console.log('Available collections:', collections.collections.map(c => ({ id: c.$id, name: c.name })));
+    // Try the known collection name first
+    const knownCollectionId = 'customers';
 
-    const possibleNames = ['customers', 'customer', 'client', 'clients', 'Customer', 'Customers'];
-
-    for (const collection of collections.collections) {
-      if (possibleNames.includes(collection.$id) || possibleNames.includes(collection.name)) {
-        console.log('Found customer collection:', collection.$id, collection.name);
-        appwriteConfig.collections.customers = collection.$id;
-        return collection.$id;
-      }
-    }
-
-    if (collections.collections.length > 0) {
-      const firstCollection = collections.collections[0];
-      console.log('No customer collection found, using first available:', firstCollection.$id, firstCollection.name);
-      appwriteConfig.collections.customers = firstCollection.$id;
-      return firstCollection.$id;
-    }
-
-    throw new Error('No collections found in database');
+    // Just use the known collection ID since we know it exists
+    console.log('Using customers collection:', knownCollectionId);
+    appwriteConfig.collections.customers = knownCollectionId;
+    return knownCollectionId;
   } catch (error) {
     console.error('Failed to find customer collection:', error);
+    // Fallback to 'customers' as default
+    appwriteConfig.collections.customers = 'customers';
     return 'customers';
   }
 };
